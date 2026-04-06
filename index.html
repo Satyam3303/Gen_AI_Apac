@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Productivity Assistant</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        input {
+            width: 60%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #response {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🤖 AI Productivity Assistant</h1>
+
+    <input type="text" id="userInput" placeholder="Enter your task...">
+    <button onclick="sendMessage()">Send</button>
+
+    <div id="response" style="white-space: pre-line;"></div>
+
+<script>
+async function sendMessage() {
+    let input = document.getElementById("userInput").value;
+
+    let res = await fetch(`/chat?user_input=${encodeURIComponent(input)}`);
+    let data = await res.json();
+
+    let output = "";
+
+    // Handle error
+    if (data.error) {
+        output = "⚠️ " + data.error;
+    }
+
+    // Handle tasks list
+    else if (data.tasks) {
+    output = `🤖 ${data.agent || "Assistant"}:\n`;
+
+    if (data.response) {
+        output += data.response + "\n\n";
+    }
+
+    output += "📋 Your Tasks:\n";
+
+    data.tasks.forEach((t, i) => {
+        output += `${i + 1}. ${t.task}\n`;
+    });
+}
+
+    // Handle normal response
+    else {
+        output = `🤖 ${data.agent || "Assistant"}:\n${data.response}`;
+    }
+
+    document.getElementById("response").innerText = output;
+}
+</script>
+
+</body>
+</html>
